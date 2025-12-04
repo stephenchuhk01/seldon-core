@@ -16,7 +16,7 @@ get_apis:
 .PHONY: build_apis
 build_apis: get_apis
 	# Protobuf
-	cd seldon_core && python \
+	cd seldon_core && poetry run python \
 		-m grpc.tools.protoc \
 		-I./ \
 		-I./proto/ \
@@ -26,7 +26,7 @@ build_apis: get_apis
 		./proto/prediction.proto
 	## We build TF's protobufs as well in case the tensorflow package
 	## is not found
-	cd seldon_core/proto && python \
+	cd seldon_core/proto && poetry run python \
 		-m grpc.tools.protoc \
 		-I./ \
 		-I../ \
@@ -47,46 +47,46 @@ update_package: get_apis build_apis update_version
 
 .PHONY: install
 install:
-	pip install -e .
+	poetry install --only main
 
 .PHONY: install_dev
 install_dev:
-	pip install -e . -r requirements-dev.txt
+	poetry install
 
 .PHONY: licenses
 licenses:
-	tox --recreate -e licenses
+	poetry run tox --recreate -e licenses
 	cut -d, -f1,3 ./licenses/license_info.csv \
 		> ./licenses/license_info.no_versions.csv
 
 .PHONY: uninstall
 uninstall:
-	pip uninstall seldon-core
+	poetry env remove --all
 
 .PHONY: test
 test:
-	tox
+	poetry run tox
 
 .PHONY: type_check
 type_check:
-	mypy --ignore-missing-imports --no-strict-optional seldon_core
+	poetry run mypy --ignore-missing-imports --no-strict-optional seldon_core
 
 .PHONY: build_pypi
 build_pypi:
-	python setup.py sdist bdist_wheel
+	poetry build
 
 .PHONY: build_conda
 build_conda:
 	mkdir -p conda-bld
-	conda build conda.recipe/meta.yaml -c conda-forge --output-folder conda-bld
+	poetry run conda build conda.recipe/meta.yaml -c conda-forge --output-folder conda-bld
 
 .PHONY: push_pypi_test
 push_pypi_test:
-	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+	poetry publish --repository testpypi
 
 .PHONY: push_pypi
 push_pypi:
-	twine upload dist/*
+	poetry publish
 
 .PHONY: push_conda
 push_conda:
@@ -95,31 +95,31 @@ push_conda:
 	@echo "Alternatively use anaconda upload to publish on own channel"
 
 setup_linter:
-	pip install black==20.8b1 isort==5.7.0 nbqa==0.10.0
+	@echo "Linters are now managed by Poetry. Run 'poetry install' to set up."
 
 fmt:
-	black \
+	poetry run black \
 		./ ../testing/scripts ../operator/helm ../operator/hack \
 		--exclude "(proto|seldon_core/proto/|.eggs|.tox)"
-	isort \
+	poetry run isort \
 		./ ../testing/scripts ../operator/helm ../operator/hack \
 		--skip proto --skip seldon_core/proto --skip .eggs --skip .tox
-	nbqa black \
+	poetry run nbqa black \
 		../ --nbqa-exclude "(proto|seldon_core/proto/|.eggs|.tox|_README\.ipynb)"
-	nbqa isort \
+	poetry run nbqa isort \
 		../ --profile black --nbqa-exclude "(proto|seldon_core/proto/|.eggs|.tox|_README\.ipynb)"
 
 lint:
-	black \
+	poetry run black \
 		--check ./ ../testing/scripts \
 		--exclude "(proto|seldon_core/proto/|.eggs|.tox)"
-	isort \
+	poetry run isort \
 		--check-only ./ ../testing/scripts \
 		--skip proto --skip seldon_core/proto --skip .eggs --skip .tox
-	flake8
-	nbqa black \
+	poetry run flake8
+	poetry run nbqa black \
 		../ --check --nbqa-exclude "(proto|seldon_core/proto/|.eggs|.tox|_README\.ipynb)"
-	nbqa isort \
+	poetry run nbqa isort \
 		../ --check-only --profile black --nbqa-exclude "(proto|seldon_core/proto/|.eggs|.tox|_README\.ipynb)"
 	# Check if licenses have changed
 	git \

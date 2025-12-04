@@ -1,3 +1,70 @@
+[tool.poetry]
+name = "seldon-core"
+version = "1.17.1"
+description = "Seldon Core client and microservice wrapper"
+authors = ["Seldon Technologies Ltd. <hello@seldon.io>"]
+license = "Apache 2.0"
+readme = "README.md"
+homepage = "https://github.com/SeldonIO/seldon-core"
+packages = [{include = "seldon_core"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+Flask = ">=3.0.0,<4.0.0"
+jsonschema = ">=4.20.0,<5.0.0"
+Flask-cors = ">=5.0.0,<7.0.0"
+requests = ">=2.31.0,<3.0.0"
+numpy = ">=1.26.0,<3.0.0"
+protobuf = ">=4.21.6,<7.0.0"
+grpcio = ">=1.60.0,<2.0.0"
+Flask-OpenTracing = ">=1.1.0,<3.0.0"
+opentracing = ">=2.4.0,<3.0.0"
+jaeger-client = ">=4.8.0,<5.0.0"
+grpcio-opentracing = ">=1.1.4,<2.0.0"
+grpcio-reflection = ">=1.60.0,<2.0.0"
+gunicorn = ">=22.0.0,<24.0.0"
+setuptools = ">=75.0.0"
+prometheus_client = ">=0.20.0,<1.0.0"
+werkzeug = ">=3.0.0,<4.0.0"
+cryptography = ">=43.0.0,<47.0.0"
+PyYAML = ">=6.0.0,<7.0.0"
+click = ">=8.1.0,<9.0.0"
+urllib3 = ">=2.0.0,<3.0.0"
+tensorflow = {version = "*", optional = true}
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.0.0"
+coverage = "^7.6.0"
+flake8 = "^7.1.0"
+grpcio-tools = ">=1.60.0,<2.0.0"
+isort = "^5.13.0"
+mypy-protobuf = "^3.6.0"
+mypy = "^1.13.0"
+pandas = "^2.2.0"
+pillow = "^11.0.0"
+pip-licenses = "^5.0.0"
+pytest-cov = "^6.0.0"
+pytest = "^8.3.0"
+pytest-mock = "^3.14.0"
+tenacity = "^9.0.0"
+nbqa = "^1.9.0"
+tox = "^4.23.0"
+
+[tool.poetry.extras]
+tensorflow = ["tensorflow"]
+all = ["tensorflow"]
+
+[tool.poetry.scripts]
+seldon-core-microservice = "seldon_core.microservice:main"
+seldon-core-tester = "seldon_core.microservice_tester:main"
+seldon-core-microservice-tester = "seldon_core.microservice_tester:main"
+seldon-core-api-tester = "seldon_core.api_tester:main"
+seldon-batch-processor = "seldon_core.batch_processor:run_cli"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 # https://pycqa.github.io/isort/docs/configuration/black_compatibility/
 [tool.isort]
 profile = "black"
